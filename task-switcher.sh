@@ -1,0 +1,1 @@
+/home/alu/coding/dots/.local/bin/task-switcher.sh
