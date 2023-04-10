@@ -1,1 +1,3 @@
-/home/alu/coding/dots/.local/bin/task-switcher.sh
+#!/bin/bash
+
+rofi -show window -show-icons -window-thumbnai

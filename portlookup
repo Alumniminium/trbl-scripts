@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# check if nmap-services file exists in ~/.cache/portlookup
+# if not, download it
+if [ ! -f ~/.cache/portlookup/nmap-services ]; then
+    mkdir -p ~/.cache/portlookup
+    wget -O ~/.cache/portlookup/nmap-services https://svn.nmap.org/nmap/nmap-services
+    wget -O ~/.cache/portlookup/iana-list https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.txt
+fi
+
+port=$(rofi -dmenu -p "Port:")
+
+if [ -z "$port" ]; then
+    exit 0
+fi
+
+output1=$(cat ~/.cache/portlookup/nmap-services | sed 's/\t/ /g' | grep " $port/tcp" | cut -d ' ' -f1,2,4-)
+output2=$(cat ~/.cache/portlookup/iana-list | sed 's/\t/ /g' | tr -s ' ' | grep " $port " | cut -d '[' -f1)
+
+selection=$(echo "$output" "$output2" | rofi -dmenu -p "Select to Clipboard:")
+
+if [ -z "$selection" ]; then
+    exit 0
+fi
+
+xclip -selection clipboard <<< "$selection"

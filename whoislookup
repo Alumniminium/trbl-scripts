@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# requires whois
+
+ip=$(rofi -dmenu -p "IP:" | tr -d ' ' | tr -d ':')
+if [ -z "$ip" ]; then
+    exit 0
+fi
+whois $ip | sed '/^$/d' | sed '/^#/d'| sed '/^remarks/d' | sed '/^%/d' | rofi -dmenu -l 20

@@ -1,1 +1,8 @@
-/home/alu/coding/dots/.local/bin/RestoreSession
+#!/bin/sh
+export MONITOR=DisplayPort-0
+export WIFI=$(ip a | grep " w" | cut -d ' ' -f 2 | cut -d ':' -f1)
+pkill polybar -KILL
+xrandr --output $MONITOR --mode 2560x1440 --rate 144
+screen -dmS polybar sh -c 'polybar example'
+bspc monitor $MONITOR -d            
+feh --bg-fill .bg2

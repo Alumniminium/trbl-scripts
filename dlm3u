@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+i=0
+while IFS= read -r line; do
+    let "i+=1" 
+    url=$(echo "$line" | sed 's\ \%20\g') 
+    echo "$i $url"
+    wget "$url"
+done < $1

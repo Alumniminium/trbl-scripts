@@ -1,1 +1,16 @@
-/home/alu/coding/dots/.local/bin/backup
+#!/bin/bash
+
+user="trbl"
+host="192.168.0.2"
+dest="/mnt/4TB/Backups/Ideapad/Latest"
+
+# send notification that backup has been started
+DISPLAY=:0 /usr/bin/notify-send 'Backup' "Starting backup ($(date +%A))" --icon=emblem-synchronized -u critical
+# Update symlink to Latest to current day of the week
+ssh $user@$host "ln -sfT /mnt/4TB/Backups/Ideapad/$(date +%A) $dest"
+# Sync everyhting not in the ignorelist to the homeserver
+rsync -aAXOPh --inplace --delete --backup --suffix=$(date +'.%F_%H-%M') --exclude-from=${HOME}/.local/bin/backupignorelist -e "ssh -o Compression=no" / $user@$host:$dest
+# send notification that backup has been completed
+DISPLAY=:0 /usr/bin/notify-send 'Backup' "Finished backup: ($(date +%A))" --icon=emblem-synchronized -u critical
+
+# Homeserver will take the latest backup and upload it offsite
