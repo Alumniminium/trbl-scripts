@@ -9,8 +9,8 @@ WINDOW_NAMES_TO_MOVE=("mpv" "Chromium")
 
 # parse arguments
 if [ $# -ne 1 ]; then
-    notify-send "Usage: $0 aspect_ratio" >&2
-    notify-send $@
+    notify-send "Aspect.sh" "Usage: $0 aspect_ratio" >&2
+    notify-send "Aspect.sh" $@
     exit 1
 fi
 
@@ -18,7 +18,7 @@ aspect_ratio=$1
 
 # check if aspect ratio is supported
 if ! echo "${ASPECT_RATIOS[@]}" | grep -qw "$aspect_ratio"; then
-    notify-send "Unsupported aspect ratio: $aspect_ratio" >&2
+    notify-send "Aspect.sh" "Unsupported aspect ratio: $aspect_ratio" >&2
     exit 1
 fi
 
@@ -30,7 +30,7 @@ size=$(xdotool getwindowgeometry --shell $(xdotool getactivewindow) | awk -F '='
 width=$(echo "$size" | awk -F "x" '{print $1}')
 height=$(echo "$size" | awk -F "x" '{print $2}')
 if [ -z "$width" ] || [ -z "$height" ]; then
-    notify-send "Failed to get window size" >&2
+    notify-send "Aspect.sh" "Failed to get window size" >&2
     exit 1
 fi
 ratio=$(echo "scale=2; $width / $height" | bc)
@@ -66,12 +66,10 @@ if [ "$size" ]; then
     new_width=$(echo "$size" | awk -F "x" '{print $1}')
     new_height=$(echo "$size" | awk -F "x" '{print $2}')
     xdotool windowsize $wid $new_width $new_height
-    notify-send "Resized window to $size"
 fi
 
 # Get active window name
 window_name=$(xdotool getwindowname $wid)
-notify-send "window: $window_name"
 
 # Check if the window name is in the list
 move_window=false
@@ -85,7 +83,7 @@ done
 # Move the window to the bottom right corner if its name is in the list
 if $move_window; then
     # Define margin (in pixels)
-    margin=10
+    margin=$(bspc config window_gap)
 
     # Get screen dimensions
     screen_width=$(xdotool getdisplaygeometry | awk '{print $1}')
@@ -97,7 +95,12 @@ if $move_window; then
 
     # Move the window to the new position
     xdotool windowmove $wid $new_x $new_y
-
-    # Notify user
-    notify-send "Moved window to the bottom right corner with a ${margin}px margin"
 fi
+
+if $move_window; then
+    # Notify user
+    notify-send "Aspect.sh" "Resized window to $size and Moved to the bottom right corner with a ${margin}px margin"
+else
+    notify-send "Aspect.sh" "Resized window to $size"
+fi
+
