@@ -4,6 +4,8 @@
 ASPECT_RATIOS=("16:9" "4:3")
 SIZES_16_9=("640x360" "1280x720" "1600x900" "1920x1080")
 SIZES_4_3=("640x480" "1024x768" "1280x960" "1600x1200")
+WINDOW_NAMES_TO_MOVE=("mpv" "Chromium")
+
 
 # parse arguments
 if [ $# -ne 1 ]; then
@@ -65,4 +67,37 @@ if [ "$size" ]; then
     new_height=$(echo "$size" | awk -F "x" '{print $2}')
     xdotool windowsize $wid $new_width $new_height
     notify-send "Resized window to $size"
+fi
+
+# Get active window name
+window_name=$(xdotool getwindowname $wid)
+notify-send "window: $window_name"
+
+# Check if the window name is in the list
+move_window=false
+for window_name_to_move in "${WINDOW_NAMES_TO_MOVE[@]}"; do
+    if [[ "$window_name" == *"$window_name_to_move"* ]]; then
+        move_window=true
+        break
+    fi
+done
+
+# Move the window to the bottom right corner if its name is in the list
+if $move_window; then
+    # Define margin (in pixels)
+    margin=10
+
+    # Get screen dimensions
+    screen_width=$(xdotool getdisplaygeometry | awk '{print $1}')
+    screen_height=$(xdotool getdisplaygeometry | awk '{print $2}')
+
+    # Calculate new window position
+    new_x=$((screen_width - new_width - margin))
+    new_y=$((screen_height - new_height - margin))
+
+    # Move the window to the new position
+    xdotool windowmove $wid $new_x $new_y
+
+    # Notify user
+    notify-send "Moved window to the bottom right corner with a ${margin}px margin"
 fi
