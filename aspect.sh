@@ -53,13 +53,13 @@ done
 
 
 # cycle through sizes on subsequent runs
-if [ -f "/tmp/aspect_sizes_$aspect_ratio" ]; then
-    idx=$(cat "/tmp/aspect_sizes_$aspect_ratio")
+if [ -f "/tmp/aspect_sizes_$wid" ]; then
+    idx=$(cat "/tmp/aspect_sizes_$wid")
     next_idx=$(( (idx + 1) % ${#sizes[@]} ))
-    echo $next_idx > "/tmp/aspect_sizes_$aspect_ratio"
+    echo $next_idx > "/tmp/aspect_sizes_$wid"
     size=${sizes[$idx]}
 else
-    echo "0" > "/tmp/aspect_sizes_$aspect_ratio"
+    echo "0" > "/tmp/aspect_sizes_$wid"
 fi
 
 if [ "$size" ]; then
@@ -83,7 +83,8 @@ done
 # Move the window to the bottom right corner if its name is in the list
 if $move_window; then
     # Define margin (in pixels)
-    margin=$(bspc config window_gap)
+    # Get the current window gap and multiply it by 2
+    margin=$(($(bspc config window_gap) * 2 - $(bspc config border_width)))
 
     # Get screen dimensions
     screen_width=$(xdotool getdisplaygeometry | awk '{print $1}')
